@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BallPool.WebAPI", "8BallPool.WebAPI\8BallPool.WebAPI.csproj", "{222B2D84-E319-49B1-8D81-6006C783B5CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BallPool.Business", "8BallPool.Business\8BallPool.Business.csproj", "{5DE6085F-C71D-411F-80BF-B0B1BF1B4305}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BallPool.Data", "8BallPool.Data\8BallPool.Data.csproj", "{1C4D3637-13EE-466C-91D0-24D8623FE221}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{222B2D84-E319-49B1-8D81-6006C783B5CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{222B2D84-E319-49B1-8D81-6006C783B5CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{222B2D84-E319-49B1-8D81-6006C783B5CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{222B2D84-E319-49B1-8D81-6006C783B5CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DE6085F-C71D-411F-80BF-B0B1BF1B4305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DE6085F-C71D-411F-80BF-B0B1BF1B4305}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DE6085F-C71D-411F-80BF-B0B1BF1B4305}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DE6085F-C71D-411F-80BF-B0B1BF1B4305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

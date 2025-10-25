@@ -1,0 +1,56 @@
+# .gitignore for 8 Ball Pool Web API project
+
+# Ignore build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+node_modules/
+packages/
+
+# Environment variables
+.env
+
+# Database files
+*.db
+*.sqlite
+
+# Generated files
+Generated/
+ServiceFabricBackup/
+
+# Entity Framework migrations
+Migrations/
+
+# Rider/JetBrains IDE files
+.idea/
+*.iml
+
+# ReSharper files
+_ReSharper.Caches/
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+*.testresults
+
+# Temporary files
+*.tmp
+*.temp
