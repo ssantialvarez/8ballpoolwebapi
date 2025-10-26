@@ -1,18 +1,64 @@
 using _8BallPool.Business.Interfaces;
+using _8BallPool.Data.Interfaces;
 using _8BallPool.Data.Models;
 
 namespace _8BallPool.Business.Modules
 {
     public class PlayerModule : IPlayerModule
     {
-        public Task<Player> CreatePlayerAsync(Player player)
+        private readonly IPlayerRepository _playerRepository;
+
+        public PlayerModule(IPlayerRepository playerRepository)
         {
-            throw new NotImplementedException();
+            _playerRepository = playerRepository;
         }
 
-        public Task<IEnumerable<Player>> GetPlayersAsync(string? nameFilter = null)
+        public async Task<Player> CreatePlayerAsync(Player player)
         {
-            throw new NotImplementedException();
+            await _playerRepository.AddPlayerAsync(player);
+            return player;  
+        }
+
+        public async Task<IEnumerable<Player>> GetPlayersAsync(string? nameFilter = null)
+        {
+            var players = await _playerRepository.GetAllPlayersAsync();
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                players = players.Where(p => p.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            return players;
+        }
+
+        public async Task<Player?> GetPlayerByIdAsync(int id)
+        {
+            return await _playerRepository.GetPlayerByIdAsync(id);
+        }
+
+        public async Task<Player?> UpdatePlayerAsync(int id, Player updatedPlayer)
+        {
+            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(id);
+            if (existingPlayer == null)
+            {
+                return null;
+            }
+
+            existingPlayer.Name = updatedPlayer.Name;
+            existingPlayer.Ranking = updatedPlayer.Ranking;
+
+            await _playerRepository.UpdatePlayerAsync(existingPlayer);
+            return existingPlayer;
+        }
+
+        public async Task<bool> DeletePlayerAsync(int id)
+        {
+            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(id);
+            if (existingPlayer == null)
+            {
+                return false;
+            }
+
+            await _playerRepository.DeletePlayerAsync(id);
+            return true;
         }
     }
 }
