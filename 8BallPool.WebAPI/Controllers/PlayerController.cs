@@ -1,11 +1,12 @@
 using _8BallPool.Business.Interfaces;
 using _8BallPool.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace _8BallPool.WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/players")]
     public class PlayerController : ControllerBase
     {
         private readonly IPlayerModule _playerModule;
@@ -16,6 +17,7 @@ namespace _8BallPool.WebAPI.Controllers
         
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin")]
         [HttpGet("", Name = "GetPlayers")]
         public async Task<IActionResult> GetPlayers()
         {
@@ -29,6 +31,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin")]
         [HttpPost("", Name = "CreatePlayer")]
         public async Task<IActionResult> CreatePlayer([FromBody] Player player)
         {
@@ -40,6 +43,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
         [HttpGet("{id}", Name = "GetPlayerById")]
         public async Task<IActionResult> GetPlayerById(int id)
         {
@@ -55,6 +59,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
         [HttpGet("me", Name = "GetMyPlayer")]
         public async Task<IActionResult> GetMyPlayer()
         {
@@ -65,6 +70,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
         [HttpPut("me", Name = "UpdateMyPlayer")]
         public async Task<IActionResult> UpdateMyPlayer()
         {
@@ -75,6 +81,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}", Name = "DeletePlayer")]
         public async Task<IActionResult> DeletePlayer(int id)
         {
