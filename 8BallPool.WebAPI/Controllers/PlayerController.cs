@@ -33,6 +33,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         [HttpPost("", Name = "CreatePlayer")]
+        [HttpPost("/auth/register")]
         public async Task<IActionResult> CreatePlayer([FromBody] Player player)
         {
             // use module method to create player
