@@ -51,6 +51,15 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IPlayerModule, PlayerModule>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 
+// Add CORS policy to allow requests from localhost:3000
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost3000",
+        policy => policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
+
 // 1. Add Authentication Services
 builder.Services.AddAuthentication(options =>
 {
@@ -72,6 +81,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS for localhost:3000
+app.UseCors("AllowLocalhost3000");
 
 // 2. Enable authentication middleware
 app.UseAuthentication();
