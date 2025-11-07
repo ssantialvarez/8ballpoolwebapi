@@ -17,7 +17,7 @@ namespace _8BallPool.WebAPI.Controllers
         
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpGet("", Name = "GetPlayers")]
         public async Task<IActionResult> GetPlayers()
         {
@@ -31,7 +31,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost("", Name = "CreatePlayer")]
         [HttpPost("/auth/register")]
         public async Task<IActionResult> CreatePlayer([FromBody] Player player)
@@ -82,7 +82,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}", Name = "DeletePlayer")]
         public async Task<IActionResult> DeletePlayer(int id)
         {

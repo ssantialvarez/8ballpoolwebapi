@@ -69,6 +69,11 @@ builder.Services.AddAuthentication(options =>
 {
     options.Authority = "https://dev-4yhmgnvzoefgdi26.us.auth0.com/";
     options.Audience = "http://localhost:5234";
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        NameClaimType = "name",
+        RoleClaimType = "permissions"
+    };
 });
 
 var app = builder.Build();
