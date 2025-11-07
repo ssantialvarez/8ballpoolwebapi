@@ -13,10 +13,19 @@ namespace _8BallPool.Business.Modules
             _playerRepository = playerRepository;
         }
 
-        public async Task<Player> CreatePlayerAsync(Player player)
+        public async Task<Player> CreatePlayerAsync(PlayerDto player)
         {
-            await _playerRepository.AddPlayerAsync(player);
-            return player;  
+            var newPlayer = new Player
+            {
+                Auth0_id = player.Auth0_id,
+                Name = player.Name,
+                Ranking = player.Ranking,
+                Preferred_cue = player.Preferred_cue,
+                Profile_picture_url = player.Profile_picture_url
+            };
+
+            await _playerRepository.AddPlayerAsync(newPlayer);
+            return newPlayer;
         }
 
         public async Task<IEnumerable<Player>> GetPlayersAsync(string? nameFilter = null)

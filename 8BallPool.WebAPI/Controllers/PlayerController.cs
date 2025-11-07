@@ -34,7 +34,7 @@ namespace _8BallPool.WebAPI.Controllers
         [Authorize(Roles = "admin")]
         [HttpPost("", Name = "CreatePlayer")]
         [HttpPost("/auth/register")]
-        public async Task<IActionResult> CreatePlayer([FromBody] Player player)
+        public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto player)
         {
             // use module method to create player
             var createdPlayer = await _playerModule.CreatePlayerAsync(player);
