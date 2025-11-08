@@ -14,7 +14,7 @@ services:
     restart: on-failure
 
   postgres:
-    image: postgres:17
+    image: postgres
     container_name: postgres
     restart: always
     environment:
@@ -22,7 +22,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: 8ballpooldb
     ports:
-      - "5433:5432" 
+      - "5432:5432" 
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - data_protection:/home/app/.aspnet/DataProtection-Keys
