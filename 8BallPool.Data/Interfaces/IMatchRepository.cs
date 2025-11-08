@@ -5,14 +5,10 @@ namespace _8BallPool.Data.Interfaces
     public interface IMatchRepository
     {
         Task<Match?> GetMatchByIdAsync(int id);
-        // get matches should accept filters
-        /*
-        ■​ date=YYYY-MM-DD – returns matches on a specific date.
-        ■​ status=upcoming|ongoing|completed – filter by status.
-*/
         Task<IEnumerable<Match>> GetAllMatchesAsync();
-        Task AddMatchAsync(Match match);
-        Task UpdateMatchAsync(Match match);
-        Task DeleteMatchAsync(Match match);
+        Task<IEnumerable<Match>> GetMatchesByPlayerIdAsync(int playerId);
+        Task<Match?> AddMatchAsync(Match match);
+        Task<Match?> UpdateMatchAsync(Match match);
+        Task<bool> DeleteMatchAsync(Match match);
     }
 }

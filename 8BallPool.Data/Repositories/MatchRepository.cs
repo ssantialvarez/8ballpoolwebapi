@@ -29,19 +29,33 @@ public class MatchRepository : IMatchRepository
             .Include(m => m.Winner)
             .ToListAsync();
     }
-    public async Task AddMatchAsync(Match match)
+
+    public async Task<IEnumerable<Match>> GetMatchesByPlayerIdAsync(int playerId)
     {
-        _context.Matches.Add(match);
-        await _context.SaveChangesAsync();
+        return await _context.Matches
+            .Include(m => m.Player1)
+            .Include(m => m.Player2)
+            .Include(m => m.Winner)
+            .Where(m => m.Player1Id == playerId || m.Player2Id == playerId)
+            .OrderByDescending(m => m.StartTime)
+            .ToListAsync();
     }
-    public async Task UpdateMatchAsync(Match match)
+
+    public async Task<Match?> AddMatchAsync(Match match)
     {
-        _context.Matches.Update(match);
+        var newMatch = _context.Matches.Add(match);
         await _context.SaveChangesAsync();
+        return newMatch.Entity;
     }
-    public async Task DeleteMatchAsync(Match match)
+    public async Task<Match?> UpdateMatchAsync(Match match)
+    {
+        var updatedMatch = _context.Matches.Update(match);
+        await _context.SaveChangesAsync();
+        return updatedMatch.Entity;
+    }
+    public async Task<bool> DeleteMatchAsync(Match match)
     {
         _context.Matches.Remove(match);
-        await _context.SaveChangesAsync();
+        return await _context.SaveChangesAsync() > 0;
     }
 }

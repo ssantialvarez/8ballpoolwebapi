@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using _8BallPool.Business.DTOs;
 using _8BallPool.Business.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -62,8 +63,9 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}", Name = "UpdateMatch")]
-        public async Task<IActionResult> UpdateMatch(int id, [FromBody] MatchDto match)
+        public async Task<IActionResult> UpdateMatch(int id, [FromBody] UpdateMatchDto match)
         {
             try
             {
@@ -76,20 +78,86 @@ namespace _8BallPool.WebAPI.Controllers
             }
         }
 
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        [HttpPatch("{id}/finish", Name = "FinishMatch")]
+        public async Task<IActionResult> FinishMatch(int id, [FromBody] FinishMatchDto finishMatchDto)
+        {
+            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (auth0Id == null)
+            {
+                return Forbid();
+            }
+
+            // Check if user is admin
+            var isAdmin = User.IsInRole("admin");
+
+            try
+            {
+                var finishedMatch = await _matchModule.FinishMatchAsync(id, finishMatchDto.WinnerId, auth0Id, isAdmin);
+                return Ok(finishedMatch);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+        }
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
         [HttpDelete("{id}", Name = "DeleteMatch")]
         public async Task<IActionResult> DeleteMatch(int id)
         {
+            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (auth0Id == null)
+            {
+                return Forbid();
+            }
+
+            // Check if user is admin
+            var isAdmin = User.IsInRole("admin");
+
             try
             {
-                await _matchModule.DeleteMatchAsync(id);
+                // If not admin, validate that the user is one of the match participants
+                if (!isAdmin)
+                {
+                    await _matchModule.DeleteMatchAsync(id, auth0Id);
+                }
+                else
+                {
+                    // Admin can delete any match without validation
+                    var match = await _matchModule.GetMatchByIdAsync(id);
+                    if (match == null)
+                    {
+                        return NotFound(new { message = "Match does not exist." });
+                    }
+                    await _matchModule.DeleteMatchAsync(id, auth0Id);
+                }
                 return NoContent();
             }
             catch (ArgumentException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
             }
         }
     }

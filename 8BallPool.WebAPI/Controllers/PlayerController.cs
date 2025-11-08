@@ -12,10 +12,12 @@ namespace _8BallPool.WebAPI.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IPlayerModule _playerModule;
+        private readonly IMatchModule _matchModule;
 
-        public PlayerController(IPlayerModule playerModule)
+        public PlayerController(IPlayerModule playerModule, IMatchModule matchModule)
         {
             _playerModule = playerModule;
+            _matchModule = matchModule;
         }
         
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -108,7 +110,7 @@ namespace _8BallPool.WebAPI.Controllers
         public async Task<IActionResult> UpdateMyPlayer([FromBody] Player player)
         {
             // from token claims, get the Auth0_id of the authenticated user
-            var auth0Id = User.FindFirst("sub")?.Value;
+            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (auth0Id == null)
             {
                 return BadRequest();
@@ -134,6 +136,54 @@ namespace _8BallPool.WebAPI.Controllers
             // use module method to delete player by id
             await _playerModule.DeletePlayerAsync(id);
             return NoContent();
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        [HttpGet("{id}/matches", Name = "GetPlayerMatches")]
+        public async Task<IActionResult> GetPlayerMatches(int id)
+        {
+            try
+            {
+                var matches = await _matchModule.GetMatchesByPlayerIdAsync(id);
+                return Ok(matches);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        [HttpGet("me/matches", Name = "GetMyMatches")]
+        public async Task<IActionResult> GetMyMatches()
+        {
+            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (auth0Id == null)
+            {
+                return NotFound();
+            }
+
+            var player = await _playerModule.GetPlayerByAuth0IdAsync(auth0Id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var matches = await _matchModule.GetMatchesByPlayerIdAsync(player.Id);
+                return Ok(matches);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }
