@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using _8BallPool.Business.Interfaces;
 using _8BallPool.Data.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -89,7 +90,7 @@ namespace _8BallPool.WebAPI.Controllers
         public async Task<IActionResult> GetMyPlayer()
         {
             // from token claims, get the Auth0_id of the authenticated user
-            var auth0Id = User.FindFirst("sub")?.Value;
+            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (auth0Id == null)
             {
                 return NotFound();
