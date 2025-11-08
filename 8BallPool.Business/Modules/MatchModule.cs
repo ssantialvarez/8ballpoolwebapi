@@ -75,12 +75,11 @@ public class MatchModule : IMatchModule
     {
         try
         {
-            //check if players exist could be added here
             var player1 = await _playerRepository.GetPlayerByIdAsync(match.Player1Id);
             var player2 = await _playerRepository.GetPlayerByIdAsync(match.Player2Id);
-            if (player1 == null || player2 == null)
+            if (player1 is null || player2 is null)
             {
-                throw new ArgumentException("One or both players do not exist.");
+                return null;
             }
 
             var newMatch = new Match
@@ -91,7 +90,8 @@ public class MatchModule : IMatchModule
             };
 
             newMatch = await _matchRepository.AddMatchAsync(newMatch);
-            return newMatch != null ? new MatchResponseDto
+
+            return new MatchResponseDto
             {
                 Id = newMatch.Id,
                 Player1Id = newMatch.Player1Id,
@@ -100,7 +100,7 @@ public class MatchModule : IMatchModule
                 EndTime = newMatch.EndTime,
                 WinnerId = newMatch.WinnerId,
                 TableNumber = newMatch.TableNumber
-            } : null;
+            };
         }
         catch (Exception ex)
         {

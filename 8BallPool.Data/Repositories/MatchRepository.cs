@@ -41,13 +41,13 @@ public class MatchRepository : IMatchRepository
             .ToListAsync();
     }
 
-    public async Task<Match?> AddMatchAsync(Match match)
+    public async Task<Match> AddMatchAsync(Match match)
     {
         var newMatch = _context.Matches.Add(match);
         await _context.SaveChangesAsync();
         return newMatch.Entity;
     }
-    public async Task<Match?> UpdateMatchAsync(Match match)
+    public async Task<Match> UpdateMatchAsync(Match match)
     {
         var updatedMatch = _context.Matches.Update(match);
         await _context.SaveChangesAsync();

@@ -51,6 +51,10 @@ namespace _8BallPool.WebAPI.Controllers
             try
             {
                 var createdMatch = await _matchModule.AddMatchAsync(match);
+                if(createdMatch == null)
+                {
+                    return BadRequest(new { message = "One or both players do not exist." });
+                }
                 return CreatedAtRoute("GetMatchById", new { id = createdMatch!.Id }, createdMatch);
             }
             catch (ArgumentException ex)
