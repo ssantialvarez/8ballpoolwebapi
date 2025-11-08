@@ -25,6 +25,11 @@ namespace _8BallPool.Data.Repositories
             return await _context.Players.FindAsync(id);
         }
 
+        public async Task<Player?> GetPlayerByAuth0IdAsync(string auth0Id)
+        {
+            return await _context.Players.FirstOrDefaultAsync(p => p.Auth0_id == auth0Id);
+        }
+
         public async Task AddPlayerAsync(Player player)
         {
             await _context.Players.AddAsync(player);

@@ -10,9 +10,12 @@ namespace _8BallPool.WebAPI.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IPlayerModule _playerModule;
-        public PlayerController(IPlayerModule playerModule)
+        private readonly IConfiguration _configuration;
+
+        public PlayerController(IPlayerModule playerModule, IConfiguration configuration)
         {
             _playerModule = playerModule;
+            _configuration = configuration;
         }
         
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -33,11 +36,32 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "admin")]
         [HttpPost("", Name = "CreatePlayer")]
-        [HttpPost("/auth/register")]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto player)
         {
             // use module method to create player
             var createdPlayer = await _playerModule.CreatePlayerAsync(player);
+            return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
+        }
+
+        // method POST /players to create a player manually (admin only)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "app")]
+        [HttpPost("/api/auth/register")]
+        public async Task<IActionResult> RegisterPlayer([FromBody] PlayerDto player)
+        {
+            /*
+            // use module method to create player
+            var clientId = User.FindFirst("sub")?.Value;
+            //validate clientId against configuration
+            if (clientId != _configuration["ClientId"])
+            {
+                return Forbid();
+            }
+            */
+            var createdPlayer = await _playerModule.RegisterPlayerAsync(player);
             return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
         }
 
@@ -64,8 +88,19 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpGet("me", Name = "GetMyPlayer")]
         public async Task<IActionResult> GetMyPlayer()
         {
-            // Implementation for fetching the authenticated user's player details will go here
-            return Ok();
+            // from token claims, get the Auth0_id of the authenticated user
+            var auth0Id = User.FindFirst("sub")?.Value;
+            if (auth0Id == null)
+            {
+                return NotFound();
+            }
+
+            var player = await _playerModule.GetPlayerByAuth0IdAsync(auth0Id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+            return Ok(player);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -75,7 +110,22 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpPut("me", Name = "UpdateMyPlayer")]
         public async Task<IActionResult> UpdateMyPlayer()
         {
-            // Implementation for updating the authenticated user's player details will go here
+            // from token claims, get the Auth0_id of the authenticated user
+            var auth0Id = User.FindFirst("sub")?.Value;
+            if (auth0Id == null)
+            {
+                return BadRequest();
+            }
+
+            var player = await _playerModule.GetPlayerByAuth0IdAsync(auth0Id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            // Update player details
+            // ...
+
             return NoContent();
         }
 

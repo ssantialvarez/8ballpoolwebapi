@@ -38,9 +38,36 @@ namespace _8BallPool.Business.Modules
             return players;
         }
 
+        public async Task<Player> RegisterPlayerAsync(PlayerDto player)
+        {
+            //first check if player with Auth0_id already exists
+            var existingPlayer = await _playerRepository.GetPlayerByAuth0IdAsync(player.Auth0_id);
+            if (existingPlayer != null)
+            {
+                return existingPlayer;
+            }
+
+            var newPlayer = new Player
+            {
+                Auth0_id = player.Auth0_id,
+                Name = player.Name,
+                Ranking = player.Ranking,
+                Preferred_cue = player.Preferred_cue,
+                Profile_picture_url = player.Profile_picture_url
+            };
+
+            await _playerRepository.AddPlayerAsync(newPlayer);
+            return newPlayer;
+        }
+
         public async Task<Player?> GetPlayerByIdAsync(int id)
         {
             return await _playerRepository.GetPlayerByIdAsync(id);
+        }
+
+        public async Task<Player?> GetPlayerByAuth0IdAsync(string auth0Id)
+        {
+            return await _playerRepository.GetPlayerByAuth0IdAsync(auth0Id);
         }
 
         public async Task<Player?> UpdatePlayerAsync(int id, Player updatedPlayer)
