@@ -11,3 +11,9 @@ public class MatchDto
 
     public MatchDto() { }
 }
+
+public class MatchResponseDto : MatchDto
+{
+    public int Id { get; set; }
+    public MatchResponseDto() { }
+}
