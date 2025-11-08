@@ -11,12 +11,10 @@ namespace _8BallPool.WebAPI.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IPlayerModule _playerModule;
-        private readonly IConfiguration _configuration;
 
-        public PlayerController(IPlayerModule playerModule, IConfiguration configuration)
+        public PlayerController(IPlayerModule playerModule)
         {
             _playerModule = playerModule;
-            _configuration = configuration;
         }
         
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -25,8 +23,6 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpGet("", Name = "GetPlayers")]
         public async Task<IActionResult> GetPlayers()
         {
-            // Implementation for fetching players will go here
-            // use module method to get all players
             var players = await _playerModule.GetPlayersAsync();
             return Ok(players);
         }
@@ -39,7 +35,6 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpPost("", Name = "CreatePlayer")]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto player)
         {
-            // use module method to create player
             var createdPlayer = await _playerModule.CreatePlayerAsync(player);
             return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
         }
@@ -109,7 +104,7 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize]
         [HttpPut("me", Name = "UpdateMyPlayer")]
-        public async Task<IActionResult> UpdateMyPlayer()
+        public async Task<IActionResult> UpdateMyPlayer([FromBody] Player player)
         {
             // from token claims, get the Auth0_id of the authenticated user
             var auth0Id = User.FindFirst("sub")?.Value;
@@ -118,14 +113,12 @@ namespace _8BallPool.WebAPI.Controllers
                 return BadRequest();
             }
 
-            var player = await _playerModule.GetPlayerByAuth0IdAsync(auth0Id);
-            if (player == null)
+            var updatedPlayer = await _playerModule.UpdatePlayerMeAsync(auth0Id, player);
+
+            if (updatedPlayer == null)
             {
                 return NotFound();
             }
-
-            // Update player details
-            // ...
 
             return NoContent();
         }

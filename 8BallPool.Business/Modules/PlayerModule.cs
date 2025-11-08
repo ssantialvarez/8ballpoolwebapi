@@ -85,6 +85,21 @@ namespace _8BallPool.Business.Modules
             return existingPlayer;
         }
 
+        public async Task<Player?> UpdatePlayerMeAsync(string auth0Id, Player updatedPlayer)
+        {
+            var existingPlayer = await _playerRepository.GetPlayerByAuth0IdAsync(auth0Id);
+            if (existingPlayer == null)
+            {
+                return null;
+            }
+
+            existingPlayer.Name = updatedPlayer.Name;
+            existingPlayer.Ranking = updatedPlayer.Ranking;
+
+            await _playerRepository.UpdatePlayerAsync(existingPlayer);
+            return existingPlayer;
+        }
+
         public async Task<bool> DeletePlayerAsync(int id)
         {
             var existingPlayer = await _playerRepository.GetPlayerByIdAsync(id);

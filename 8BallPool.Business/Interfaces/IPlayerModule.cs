@@ -10,6 +10,7 @@ namespace _8BallPool.Business.Interfaces
         Task<Player?> GetPlayerByIdAsync(int id);
         Task<Player?> GetPlayerByAuth0IdAsync(string auth0Id);
         Task<Player?> UpdatePlayerAsync(int id, Player updatedPlayer);
+        Task<Player?> UpdatePlayerMeAsync(string auth0Id, Player updatedPlayer);
         Task<bool> DeletePlayerAsync(int id);
     }
 }
