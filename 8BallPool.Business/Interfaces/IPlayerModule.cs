@@ -1,3 +1,4 @@
+using _8BallPool.Business.DTOs;
 using _8BallPool.Data.Models;
 
 namespace _8BallPool.Business.Interfaces

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using _8BallPool.Business.DTOs;
 using _8BallPool.Business.Interfaces;
 using _8BallPool.Data.Models;
 using Microsoft.AspNetCore.Authorization;

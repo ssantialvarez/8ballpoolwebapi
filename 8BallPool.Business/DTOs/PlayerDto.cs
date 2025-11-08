@@ -1,3 +1,4 @@
+namespace _8BallPool.Business.DTOs;
 public class PlayerDto
 {
     public required string Auth0_id { get; set; }
