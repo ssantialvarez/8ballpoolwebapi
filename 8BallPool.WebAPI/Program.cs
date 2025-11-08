@@ -50,6 +50,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddScoped<IPlayerModule, PlayerModule>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
+builder.Services.AddScoped<IMatchModule, MatchModule>();
+builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 
 // Add CORS policy to allow requests from localhost:3000
 builder.Services.AddCors(options =>
