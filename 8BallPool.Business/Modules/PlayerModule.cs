@@ -66,7 +66,7 @@ namespace _8BallPool.Business.Modules
             {
                 throw new UnauthorizedAccessException("Auth0 ID not found in user claims");
             }
-            
+
             return await _playerRepository.GetPlayerByAuth0IdAsync(auth0Id);
         }
 
@@ -94,7 +94,7 @@ namespace _8BallPool.Business.Modules
             {
                 throw new UnauthorizedAccessException("Auth0 ID not found in user claims");
             }
-            
+
             var existingPlayer = await _playerRepository.GetPlayerByAuth0IdAsync(auth0Id);
             if (existingPlayer == null)
             {

@@ -8,7 +8,7 @@ public class Player
     public int Ranking { get; set; }
     public string? Preferred_cue { get; set; }
     public required string Profile_picture_url { get; set; }
-    
+
     // Collection navigations for matches
     public ICollection<Match> MatchesAsPlayer1 { get; } = new List<Match>();
     public ICollection<Match> MatchesAsPlayer2 { get; } = new List<Match>();

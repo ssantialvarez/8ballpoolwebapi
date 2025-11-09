@@ -7,7 +7,7 @@ public class UpdatePlayerDto
     public int? Ranking { get; set; }
     public string? Preferred_cue { get; set; }
     public string? Profile_picture { get; set; }
-    
+
     public UpdatePlayerDto() { }
     public Player MapToPlayer(string auth0Id)
     {

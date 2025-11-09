@@ -77,7 +77,7 @@ public class MatchModule : IMatchModule
         // Validate players exist
         var player1 = await _playerRepository.GetPlayerByIdAsync(match.Player1Id);
         var player2 = await _playerRepository.GetPlayerByIdAsync(match.Player2Id);
-        
+
         if (player1 is null || player2 is null)
         {
             throw new ArgumentException("One or both players do not exist.");

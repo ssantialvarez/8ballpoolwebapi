@@ -50,7 +50,7 @@ public class MatchRepository : IMatchRepository
             .Where(m => (m.Player1Id == playerId || m.Player2Id == playerId)
                 && (excludeMatchId == null || m.Id != excludeMatchId)
                 && m.StartTime < endTime
-                && (m.EndTime == null || m.EndTime > startTime 
+                && (m.EndTime == null || m.EndTime > startTime
                     || m.StartTime.AddMinutes(MatchDurationMinutes) > startTime))
             .AnyAsync();
 

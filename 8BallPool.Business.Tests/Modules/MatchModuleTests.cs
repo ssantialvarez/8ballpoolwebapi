@@ -123,11 +123,11 @@ public class MatchModuleTests
     {
         // Arrange
         var playerId = 1;
-        var player = new Player 
-        { 
-            Id = playerId, 
-            Auth0_id = "auth0|1", 
-            Name = "Player 1", 
+        var player = new Player
+        {
+            Id = playerId,
+            Auth0_id = "auth0|1",
+            Name = "Player 1",
             Ranking = 1500,
             Profile_picture_url = "pic.jpg"
         };
@@ -186,20 +186,20 @@ public class MatchModuleTests
             StartTime = DateTime.UtcNow
         };
 
-        var player1 = new Player 
-        { 
-            Id = 1, 
-            Auth0_id = "auth0|1", 
-            Name = "Player 1", 
+        var player1 = new Player
+        {
+            Id = 1,
+            Auth0_id = "auth0|1",
+            Name = "Player 1",
             Ranking = 1500,
             Profile_picture_url = "pic1.jpg"
         };
-        
-        var player2 = new Player 
-        { 
-            Id = 2, 
-            Auth0_id = "auth0|2", 
-            Name = "Player 2", 
+
+        var player2 = new Player
+        {
+            Id = 2,
+            Auth0_id = "auth0|2",
+            Name = "Player 2",
             Ranking = 1600,
             Profile_picture_url = "pic2.jpg"
         };
@@ -245,11 +245,11 @@ public class MatchModuleTests
         _mockPlayerRepository.Setup(r => r.GetPlayerByIdAsync(999))
             .ReturnsAsync((Player?)null);
         _mockPlayerRepository.Setup(r => r.GetPlayerByIdAsync(2))
-            .ReturnsAsync(new Player 
-            { 
-                Id = 2, 
-                Auth0_id = "auth0|2", 
-                Name = "Player 2", 
+            .ReturnsAsync(new Player
+            {
+                Id = 2,
+                Auth0_id = "auth0|2",
+                Name = "Player 2",
                 Ranking = 1600,
                 Profile_picture_url = "pic.jpg"
             });
@@ -275,11 +275,11 @@ public class MatchModuleTests
         };
 
         _mockPlayerRepository.Setup(r => r.GetPlayerByIdAsync(1))
-            .ReturnsAsync(new Player 
-            { 
-                Id = 1, 
-                Auth0_id = "auth0|1", 
-                Name = "Player 1", 
+            .ReturnsAsync(new Player
+            {
+                Id = 1,
+                Auth0_id = "auth0|1",
+                Name = "Player 1",
                 Ranking = 1500,
                 Profile_picture_url = "pic.jpg"
             });
@@ -306,11 +306,11 @@ public class MatchModuleTests
             StartTime = DateTime.UtcNow
         };
 
-        var player = new Player 
-        { 
-            Id = 1, 
-            Auth0_id = "auth0|1", 
-            Name = "Player 1", 
+        var player = new Player
+        {
+            Id = 1,
+            Auth0_id = "auth0|1",
+            Name = "Player 1",
             Ranking = 1500,
             Profile_picture_url = "pic.jpg"
         };
@@ -338,20 +338,20 @@ public class MatchModuleTests
             StartTime = DateTime.UtcNow
         };
 
-        var player1 = new Player 
-        { 
-            Id = 1, 
-            Auth0_id = "auth0|1", 
-            Name = "Player 1", 
+        var player1 = new Player
+        {
+            Id = 1,
+            Auth0_id = "auth0|1",
+            Name = "Player 1",
             Ranking = 1500,
             Profile_picture_url = "pic1.jpg"
         };
-        
-        var player2 = new Player 
-        { 
-            Id = 2, 
-            Auth0_id = "auth0|2", 
-            Name = "Player 2", 
+
+        var player2 = new Player
+        {
+            Id = 2,
+            Auth0_id = "auth0|2",
+            Name = "Player 2",
             Ranking = 1600,
             Profile_picture_url = "pic2.jpg"
         };
@@ -381,20 +381,20 @@ public class MatchModuleTests
             StartTime = DateTime.UtcNow
         };
 
-        var player1 = new Player 
-        { 
-            Id = 1, 
-            Auth0_id = "auth0|1", 
-            Name = "Player 1", 
+        var player1 = new Player
+        {
+            Id = 1,
+            Auth0_id = "auth0|1",
+            Name = "Player 1",
             Ranking = 1500,
             Profile_picture_url = "pic1.jpg"
         };
-        
-        var player2 = new Player 
-        { 
-            Id = 2, 
-            Auth0_id = "auth0|2", 
-            Name = "Player 2", 
+
+        var player2 = new Player
+        {
+            Id = 2,
+            Auth0_id = "auth0|2",
+            Name = "Player 2",
             Ranking = 1600,
             Profile_picture_url = "pic2.jpg"
         };

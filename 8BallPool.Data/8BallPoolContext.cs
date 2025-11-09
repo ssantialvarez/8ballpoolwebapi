@@ -28,30 +28,30 @@ namespace _8BallPool.Data
             modelBuilder.Entity<Match>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                
+
                 // Configure StartTime as required
                 entity.Property(e => e.StartTime).IsRequired();
-                
+
                 // Configure EndTime as optional
                 entity.Property(e => e.EndTime).IsRequired(false);
-                
+
                 // Configure TableNumber as optional
                 entity.Property(e => e.TableNumber).IsRequired(false);
-                
+
                 // Configure Player1 relationship (required one-to-many)
                 entity.HasOne(m => m.Player1)
                     .WithMany(p => p.MatchesAsPlayer1)
                     .HasForeignKey(m => m.Player1Id)
                     .OnDelete(DeleteBehavior.Restrict)
                     .IsRequired();
-                
+
                 // Configure Player2 relationship (required one-to-many)
                 entity.HasOne(m => m.Player2)
                     .WithMany(p => p.MatchesAsPlayer2)
                     .HasForeignKey(m => m.Player2Id)
                     .OnDelete(DeleteBehavior.Restrict)
                     .IsRequired();
-                
+
                 // Configure Winner relationship (optional one-to-many)
                 entity.HasOne(m => m.Winner)
                     .WithMany(p => p.MatchesWon)

@@ -21,7 +21,7 @@ namespace _8BallPool.WebAPI.Controllers
             _playerModule = playerModule;
             _matchModule = matchModule;
         }
-        
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "admin")]
@@ -120,7 +120,7 @@ namespace _8BallPool.WebAPI.Controllers
                 {
                     return NotFound(new { message = "Player not found." });
                 }
-                return Ok(player);    
+                return Ok(player);
             }
             catch (UnauthorizedAccessException ex)
             {

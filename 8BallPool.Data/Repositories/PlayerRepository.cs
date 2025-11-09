@@ -39,12 +39,12 @@ namespace _8BallPool.Data.Repositories
                 return newPlayer.Entity;
             }
             catch (Exception ex)
-            {   
+            {
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("23505"))
                 {
                     throw new DuplicatePlayerException($"Un jugador con el auth0_id {player.Auth0_id} ya existe.", ex);
                 }
-                throw; 
+                throw;
             }
         }
 
