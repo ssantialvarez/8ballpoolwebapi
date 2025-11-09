@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BallPool.Business", "8Ball
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BallPool.Data", "8BallPool.Data\8BallPool.Data.csproj", "{1C4D3637-13EE-466C-91D0-24D8623FE221}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BallPool.Business.Tests", "8BallPool.Business.Tests\8BallPool.Business.Tests.csproj", "{65176D32-80A3-4A63-95C1-6FE6137064EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C4D3637-13EE-466C-91D0-24D8623FE221}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65176D32-80A3-4A63-95C1-6FE6137064EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65176D32-80A3-4A63-95C1-6FE6137064EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65176D32-80A3-4A63-95C1-6FE6137064EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65176D32-80A3-4A63-95C1-6FE6137064EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
