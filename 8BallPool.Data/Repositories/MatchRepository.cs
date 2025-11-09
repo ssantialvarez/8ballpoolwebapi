@@ -7,6 +7,7 @@ namespace _8BallPool.Data.Repositories;
 public class MatchRepository : IMatchRepository
 {
     private readonly _8BallPoolContext _context;
+    private const int MatchDurationMinutes = 90;
 
     public MatchRepository(_8BallPoolContext context)
     {
@@ -21,6 +22,7 @@ public class MatchRepository : IMatchRepository
             .Include(m => m.Winner)
             .FirstOrDefaultAsync(m => m.Id == id);
     }
+
     public async Task<IEnumerable<Match>> GetAllMatchesAsync()
     {
         return await _context.Matches
@@ -37,8 +39,22 @@ public class MatchRepository : IMatchRepository
             .Include(m => m.Player2)
             .Include(m => m.Winner)
             .Where(m => m.Player1Id == playerId || m.Player2Id == playerId)
-            .OrderByDescending(m => m.StartTime)
             .ToListAsync();
+    }
+
+    public async Task<bool> HasOverlappingMatchAsync(int playerId, DateTime startTime, int? excludeMatchId = null)
+    {
+        var endTime = startTime.AddMinutes(MatchDurationMinutes);
+
+        var overlappingMatch = await _context.Matches
+            .Where(m => (m.Player1Id == playerId || m.Player2Id == playerId)
+                && (excludeMatchId == null || m.Id != excludeMatchId)
+                && m.StartTime < endTime
+                && (m.EndTime == null || m.EndTime > startTime 
+                    || m.StartTime.AddMinutes(MatchDurationMinutes) > startTime))
+            .AnyAsync();
+
+        return overlappingMatch;
     }
 
     public async Task<Match> AddMatchAsync(Match match)

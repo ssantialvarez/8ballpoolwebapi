@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using _8BallPool.Business.DTOs;
 using _8BallPool.Business.Interfaces;
+using _8BallPool.Data.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,8 +24,15 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpGet("", Name = "GetMatches")]
         public async Task<IActionResult> GetMatches()
         {
-            var matches = await _matchModule.GetAllMatchesAsync();
-            return Ok(matches);
+            try
+            {
+                var matches = await _matchModule.GetAllMatchesAsync();
+                return Ok(matches);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving matches.", details = ex.Message });
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -34,16 +42,45 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpGet("{id}", Name = "GetMatchById")]
         public async Task<IActionResult> GetMatchById(int id)
         {
-            var match = await _matchModule.GetMatchByIdAsync(id);
-            if (match == null)
+            try
             {
-                return NotFound();
+                var match = await _matchModule.GetMatchByIdAsync(id);
+                if (match == null)
+                {
+                    return NotFound(new { message = "Match not found." });
+                }
+                return Ok(match);
             }
-            return Ok(match);
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the match.", details = ex.Message });
+            }
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        [HttpGet("player/{playerId}", Name = "GetMatchesByPlayerId")]
+        public async Task<IActionResult> GetMatchesByPlayerId(int playerId)
+        {
+            try
+            {
+                var matches = await _matchModule.GetMatchesByPlayerIdAsync(playerId);
+                return Ok(matches);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving matches.", details = ex.Message });
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("", Name = "CreateMatch")]
         public async Task<IActionResult> CreateMatch([FromBody] MatchDto match)
@@ -51,15 +88,19 @@ namespace _8BallPool.WebAPI.Controllers
             try
             {
                 var createdMatch = await _matchModule.AddMatchAsync(match);
-                if(createdMatch == null)
-                {
-                    return BadRequest(new { message = "One or both players do not exist." });
-                }
                 return CreatedAtRoute("GetMatchById", new { id = createdMatch!.Id }, createdMatch);
+            }
+            catch (DoubleBookingException ex)
+            {
+                return Conflict(new { message = ex.Message });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating the match.", details = ex.Message });
             }
         }
 
@@ -78,7 +119,11 @@ namespace _8BallPool.WebAPI.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating the match.", details = ex.Message });
             }
         }
 
@@ -113,9 +158,13 @@ namespace _8BallPool.WebAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while finishing the match.", details = ex.Message });
             }
         }
 
@@ -159,9 +208,13 @@ namespace _8BallPool.WebAPI.Controllers
             {
                 return NotFound(new { message = ex.Message });
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the match.", details = ex.Message });
             }
         }
     }

@@ -4,6 +4,7 @@ using _8BallPool.Business.DTOs;
 using _8BallPool.Business.Interfaces;
 using _8BallPool.Data.Interfaces;
 using _8BallPool.Data.Models;
+using _8BallPool.Data.Exceptions;
 
 namespace _8BallPool.Business.Modules;
 
@@ -73,39 +74,53 @@ public class MatchModule : IMatchModule
 
     public async Task<MatchResponseDto?> AddMatchAsync(MatchDto match)
     {
-        try
+        // Validate players exist
+        var player1 = await _playerRepository.GetPlayerByIdAsync(match.Player1Id);
+        var player2 = await _playerRepository.GetPlayerByIdAsync(match.Player2Id);
+        
+        if (player1 is null || player2 is null)
         {
-            var player1 = await _playerRepository.GetPlayerByIdAsync(match.Player1Id);
-            var player2 = await _playerRepository.GetPlayerByIdAsync(match.Player2Id);
-            if (player1 is null || player2 is null)
-            {
-                return null;
-            }
-
-            var newMatch = new Match
-            {
-                Player1Id = player1.Id,
-                Player2Id = player2.Id,
-                StartTime = match.StartTime,
-            };
-
-            newMatch = await _matchRepository.AddMatchAsync(newMatch);
-
-            return new MatchResponseDto
-            {
-                Id = newMatch.Id,
-                Player1Id = newMatch.Player1Id,
-                Player2Id = newMatch.Player2Id,
-                StartTime = newMatch.StartTime,
-                EndTime = newMatch.EndTime,
-                WinnerId = newMatch.WinnerId,
-                TableNumber = newMatch.TableNumber
-            };
+            throw new ArgumentException("One or both players do not exist.");
         }
-        catch (Exception ex)
+
+        // Validate players are different
+        if (match.Player1Id == match.Player2Id)
         {
-            throw new Exception("An error occurred while adding the match.", ex);
+            throw new ArgumentException("A player cannot play against themselves.");
         }
+
+        // Check for double booking for both players
+        var player1HasOverlap = await _matchRepository.HasOverlappingMatchAsync(match.Player1Id, match.StartTime);
+        if (player1HasOverlap)
+        {
+            throw new DoubleBookingException($"Player {match.Player1Id} already has a match scheduled during this time.");
+        }
+
+        var player2HasOverlap = await _matchRepository.HasOverlappingMatchAsync(match.Player2Id, match.StartTime);
+        if (player2HasOverlap)
+        {
+            throw new DoubleBookingException($"Player {match.Player2Id} already has a match scheduled during this time.");
+        }
+
+        var newMatch = new Match
+        {
+            Player1Id = player1.Id,
+            Player2Id = player2.Id,
+            StartTime = match.StartTime,
+        };
+
+        newMatch = await _matchRepository.AddMatchAsync(newMatch);
+
+        return new MatchResponseDto
+        {
+            Id = newMatch.Id,
+            Player1Id = newMatch.Player1Id,
+            Player2Id = newMatch.Player2Id,
+            StartTime = newMatch.StartTime,
+            EndTime = newMatch.EndTime,
+            WinnerId = newMatch.WinnerId,
+            TableNumber = newMatch.TableNumber
+        };
     }
 
     public async Task<MatchResponseDto?> UpdateMatchAsync(int id, UpdateMatchDto match)
@@ -210,7 +225,7 @@ public class MatchModule : IMatchModule
         }
 
         await _matchRepository.DeleteMatchAsync(existingMatch);
-        return  existingMatch != null ? new MatchResponseDto
+        return existingMatch != null ? new MatchResponseDto
         {
             Id = existingMatch.Id,
             Player1Id = existingMatch.Player1Id,
