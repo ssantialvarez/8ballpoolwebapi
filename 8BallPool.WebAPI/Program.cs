@@ -4,6 +4,7 @@ using _8BallPool.Data;
 using _8BallPool.Data.Interfaces;
 using _8BallPool.Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,28 @@ builder.Services.AddScoped<IPlayerModule, PlayerModule>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IMatchModule, MatchModule>();
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value?.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        var customErrorResponse = new
+        {
+            message = "Invalid input detected.",
+            status = 400,
+            errors = errors
+        };
+
+        return new BadRequestObjectResult(customErrorResponse);
+    };
+});
 
 // Add CORS policy to allow requests from localhost:3000
 builder.Services.AddCors(options =>
