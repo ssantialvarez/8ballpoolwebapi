@@ -4,6 +4,8 @@ using _8BallPool.Business.Interfaces;
 using _8BallPool.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace _8BallPool.WebAPI.Controllers
 {
@@ -24,22 +26,40 @@ namespace _8BallPool.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "admin")]
         [HttpGet("", Name = "GetPlayers")]
-        public async Task<IActionResult> GetPlayers()
+        public async Task<IActionResult> GetPlayers([FromQuery] string? name = null)
         {
-            var players = await _playerModule.GetPlayersAsync();
-            return Ok(players);
+            try
+            {
+                var players = await _playerModule.GetPlayersAsync(name);
+                return Ok(players);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving players.", details = ex.Message });
+            }
         }
 
-        // method POST /players to create a player manually (admin only)
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "admin")]
         [HttpPost("", Name = "CreatePlayer")]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto player)
         {
-            var createdPlayer = await _playerModule.CreatePlayerAsync(player);
-            return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
+            try
+            {
+                var createdPlayer = await _playerModule.CreatePlayerAsync(player);
+                return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
+            }
+            catch (DuplicatePlayerException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating the player.", details = ex.Message });
+            }
         }
 
         // method POST /players to create a player manually (admin only)
@@ -51,138 +71,114 @@ namespace _8BallPool.WebAPI.Controllers
         [HttpPost("/api/auth/register")]
         public async Task<IActionResult> RegisterPlayer([FromBody] PlayerDto player)
         {
-            /*
-            // use module method to create player
-            var clientId = User.FindFirst("sub")?.Value;
-            //validate clientId against configuration
-            if (clientId != _configuration["ClientId"])
+            try
             {
-                return Forbid();
+                var createdPlayer = await _playerModule.RegisterPlayerAsync(player);
+                return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
             }
-            */
-            var createdPlayer = await _playerModule.RegisterPlayerAsync(player);
-            return CreatedAtRoute("GetPlayerById", new { id = createdPlayer.Id }, createdPlayer);
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while registering the player.", details = ex.Message });
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize]
         [HttpGet("{id}", Name = "GetPlayerById")]
         public async Task<IActionResult> GetPlayerById(int id)
         {
-            // use module method to get player by id
-            var player = await _playerModule.GetPlayerByIdAsync(id);
-            if (player == null)
+            try
             {
-                return NotFound();
+                var player = await _playerModule.GetPlayerByIdAsync(id);
+                if (player == null)
+                {
+                    return NotFound(new { message = "Player not found." });
+                }
+                return Ok(player);
             }
-            return Ok(player);
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the player.", details = ex.Message });
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize]
         [HttpGet("me", Name = "GetMyPlayer")]
         public async Task<IActionResult> GetMyPlayer()
         {
-            // from token claims, get the Auth0_id of the authenticated user
-            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (auth0Id == null)
+            try
             {
-                return NotFound();
+                var player = await _playerModule.GetPlayerByAuth0IdAsync(User);
+                if (player == null)
+                {
+                    return NotFound(new { message = "Player not found." });
+                }
+                return Ok(player);    
             }
-
-            var player = await _playerModule.GetPlayerByAuth0IdAsync(auth0Id);
-            if (player == null)
+            catch (UnauthorizedAccessException ex)
             {
-                return NotFound();
+                return Unauthorized(new { message = ex.Message });
             }
-            return Ok(player);
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving your player profile.", details = ex.Message });
+            }
         }
 
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize]
         [HttpPut("me", Name = "UpdateMyPlayer")]
-        public async Task<IActionResult> UpdateMyPlayer([FromBody] Player player)
+        public async Task<IActionResult> UpdateMyPlayer([FromBody] UpdatePlayerDto player)
         {
-            // from token claims, get the Auth0_id of the authenticated user
-            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (auth0Id == null)
+            try
             {
-                return BadRequest();
+                var updatedPlayer = await _playerModule.UpdatePlayerMeAsync(User, player);
+                return Ok(updatedPlayer);
             }
-
-            var updatedPlayer = await _playerModule.UpdatePlayerMeAsync(auth0Id, player);
-
-            if (updatedPlayer == null)
+            catch (UnauthorizedAccessException ex)
             {
-                return NotFound();
+                return Unauthorized(new { message = ex.Message });
             }
-
-            return NoContent();
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating your player profile.", details = ex.Message });
+            }
         }
 
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "admin")]
         [HttpDelete("{id}", Name = "DeletePlayer")]
         public async Task<IActionResult> DeletePlayer(int id)
         {
-            // use module method to delete player by id
-            await _playerModule.DeletePlayerAsync(id);
-            return NoContent();
-        }
-
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize]
-        [HttpGet("{id}/matches", Name = "GetPlayerMatches")]
-        public async Task<IActionResult> GetPlayerMatches(int id)
-        {
             try
             {
-                var matches = await _matchModule.GetMatchesByPlayerIdAsync(id);
-                return Ok(matches);
+                var deletedPlayer = await _playerModule.DeletePlayerAsync(id);
+                return Ok(deletedPlayer);
             }
             catch (ArgumentException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
-        }
-
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize]
-        [HttpGet("me/matches", Name = "GetMyMatches")]
-        public async Task<IActionResult> GetMyMatches()
-        {
-            var auth0Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (auth0Id == null)
+            catch (Exception ex)
             {
-                return NotFound();
-            }
-
-            var player = await _playerModule.GetPlayerByAuth0IdAsync(auth0Id);
-            if (player == null)
-            {
-                return NotFound();
-            }
-
-            try
-            {
-                var matches = await _matchModule.GetMatchesByPlayerIdAsync(player.Id);
-                return Ok(matches);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the player.", details = ex.Message });
             }
         }
     }

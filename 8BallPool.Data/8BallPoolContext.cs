@@ -23,6 +23,7 @@ namespace _8BallPool.Data
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Auth0_id).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Profile_picture_url).IsRequired().HasMaxLength(300);
+                entity.HasIndex(e => e.Auth0_id).IsUnique();
             });
             modelBuilder.Entity<Match>(entity =>
             {

@@ -30,10 +30,22 @@ namespace _8BallPool.Data.Repositories
             return await _context.Players.FirstOrDefaultAsync(p => p.Auth0_id == auth0Id);
         }
 
-        public async Task AddPlayerAsync(Player player)
+        public async Task<Player> AddPlayerAsync(Player player)
         {
-            await _context.Players.AddAsync(player);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var newPlayer = await _context.Players.AddAsync(player);
+                await _context.SaveChangesAsync();
+                return newPlayer.Entity;
+            }
+            catch (Exception ex)
+            {   
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("23505"))
+                {
+                    throw new DuplicatePlayerException($"Un jugador con el auth0_id {player.Auth0_id} ya existe.", ex);
+                }
+                throw; 
+            }
         }
 
         public async Task UpdatePlayerAsync(Player player)
@@ -42,14 +54,10 @@ namespace _8BallPool.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePlayerAsync(int id)
+        public async Task DeletePlayerAsync(Player player)
         {
-            var player = await _context.Players.FindAsync(id);
-            if (player != null)
-            {
-                _context.Players.Remove(player);
-                await _context.SaveChangesAsync();
-            }
+            _context.Players.Remove(player);
+            await _context.SaveChangesAsync();
         }
     }
 }

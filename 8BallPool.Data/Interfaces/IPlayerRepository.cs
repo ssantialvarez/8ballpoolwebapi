@@ -10,8 +10,8 @@ namespace _8BallPool.Data.Interfaces
         Task<List<Player>> GetAllPlayersAsync();
         Task<Player?> GetPlayerByIdAsync(int id);
         Task<Player?> GetPlayerByAuth0IdAsync(string auth0Id);
-        Task AddPlayerAsync(Player player);
+        Task<Player> AddPlayerAsync(Player player);
         Task UpdatePlayerAsync(Player player);
-        Task DeletePlayerAsync(int id);
+        Task DeletePlayerAsync(Player player);
     }
 }
